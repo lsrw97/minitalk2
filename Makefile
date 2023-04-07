@@ -5,15 +5,13 @@ DIRLIB2		= ./ft_printf/
 SRCS	=	client.c\
 			server.c
 
-OBJ	= ${SRCS:.c=.o}
-
 LIBFT   = ./ft_printf/libft/libft.a
 
 PRINTF   = ./ft_printf/printlibft.a
 
-NAME	= minitalk.a
-
 CC		= gcc
+
+OBJS		= client server
 
 AR		= ar rcs
 
@@ -21,25 +19,27 @@ RM		= rm -rf
 
 CFLAGS	= -Wall -Wextra -Werror
 
-NAMELFT		= libft.a
+NAMELFT	= libft.a
 
-all:		${NAME}
-
-$(NAME):	$(OBJ) $(LIBFT) $(PRINTF)
-				ar rcs $(NAME) $(OBJ)
+all:		${PRINTF} $(LIBFT) server
 
 $(LIBFT):
 	make -C ./ft_printf/libft
-	cp ./ft_printf/libft/libft.a $(NAME)
 
 $(PRINTF): $(LIBFT)
 	make -C ./ft_printf/
-	cp ./ft_printf/libftprintf.a $(NAME)
+
+server:		${PRINTF} $(LIBFT) client.c server.c
+	gcc server.c ./ft_printf/printlibft.a ft_printf/libft/libft.a -o server -Werror -Wall -Wextra
+	gcc client.c ./ft_printf/printlibft.a ft_printf/libft/libft.a -o client -Werror -Wall -Wextra
+
+client:		${PRINTF} $(LIBFT) client.c
+	gcc server.c ./ft_printf/printlibft.a ft_printf/libft/libft.a -o server -Werror -Wall -Wextra
 
 clean:
 	make clean -C ./ft_printf/libft
 	make clean -C ./ft_printf
-	$(RM) $(OBJ) $(BOBJ)
+	$(RM) $(OBJS)
 
 fclean: clean
 	make fclean -C ./ft_printf/libft
@@ -50,4 +50,4 @@ re:			fclean all
 				cd ${DIRLIB} && ${MAKE} clean
 				cd ${DIRLIB2} && ${MAKE} clean
 
-.PHONY:		all clean fclean re
+.PHONY:		all clean fclean re client
